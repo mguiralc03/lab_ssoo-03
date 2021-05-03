@@ -13,7 +13,6 @@
 queue* queue_init(int size){
 
     queue * q = (queue *)malloc(sizeof(queue));
-
     return q;
 }
 
@@ -27,19 +26,19 @@ int queue_put(queue *q, struct element* x) {
 // To Dequeue an element.
 struct element* queue_get(queue *q) {
     struct element* element;
-    
+
     return element;
 }
 
 
 //To check queue state
 int queue_empty(queue *q){
-    
+
     return 0;
 }
 
 int queue_full(queue *q){
-    
+
     return 0;
 }
 
