@@ -13,15 +13,13 @@ queue* queue_init(int capacity){
     q -> array = malloc(sizeof(struct element)*capacity);
     q -> capacity = capacity;
     q -> size = 0;
-    q -> front = NULL;
-    q -> rear = NULL;
     return q;
 }
 
 
 // To Enqueue an element
 int queue_put(queue *q, struct element *x) {
-    if not (queue_full(q)){
+    if (!queue_full(q)){
         if (queue_empty(q))
             q -> front = *x;
         q -> array[q -> size] = *x;
@@ -34,26 +32,27 @@ int queue_put(queue *q, struct element *x) {
 
 // To Dequeue an element.
 struct element* queue_get(queue *q) {
-    struct element* element;
+    struct element *element;
     int i;
+    element = &(q -> front);
     for (i = 1; i < (q -> size); i++){
         q -> array[i-1] = q -> array[i];
     }
     q -> size--;
-    q -> first = q -> array[0];
-    q -> rear = q -> array[q -> size - 1];
-    q -> array[q -> size] = NULL
+    q -> front = *(q -> array[0]);
+    q -> rear = *(q -> array[q -> size - 1]);
+    //free(q -> array[q -> size]);
     return element;
 }
 
 
 //To check queue state
 int queue_empty(queue *q){
-    return (size == 0);
+    return (q -> size == 0);
 }
 
 int queue_full(queue *q){
-    return (size == capacity);
+    return (q -> size == q -> capacity);
 }
 
 //To destroy the queue and free the resources

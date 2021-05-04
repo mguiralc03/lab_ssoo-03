@@ -12,8 +12,8 @@ typedef struct queue {
   int size;
   int capacity;
   struct element *array;
-  int front;
-  int rear;
+  struct element front;
+  struct element rear;
 }queue;
 
 queue* queue_init (int size);
