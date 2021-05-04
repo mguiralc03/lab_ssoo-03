@@ -39,8 +39,8 @@ struct element* queue_get(queue *q) {
         q -> array[i-1] = q -> array[i];
     }
     q -> size--;
-    q -> front = *(q -> array[0]);
-    q -> rear = *(q -> array[q -> size - 1]);
+    q -> front = q -> array[0];
+    q -> rear = q -> array[q -> size - 1];
     //free(q -> array[q -> size]);
     return element;
 }
