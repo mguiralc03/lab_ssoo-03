@@ -10,9 +10,10 @@ struct element {
 typedef struct queue {
 	// Define the struct yourself
   int size;
-  int *array;
+  int capacity;
+  struct element *array;
   int front;
-  int roar;
+  int rear;
 }queue;
 
 queue* queue_init (int size);

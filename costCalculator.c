@@ -31,24 +31,16 @@ int consumer(){
 }
 
 int main (int argc, const char * argv[] ) {
-    size_t buffsize = 500;
-    char buffer[buffsize];
     int total = 0;
-    int i, m;
+    int i;
     close(STDIN_FILENO);
     if ((fd = open(argv[1])) < 0){
         return perror("Error opening the file");
     }
-    scanf("%s", buffer);
-    //num_bytes = getline(buffer, &buffsize, fd);
-    num_lines = atoi(strtok(buffer,"\n"));
-    int array[num_lines - 1][3];
+    fscanf(fd, "%d", num_lines);
+    int array[num_lines][3];
     for (i = 0; i < num_lines; i++){
-        //lseek(fd, num_bytes, SEEK_CUR);
-        //num_bytes = getline(buffer, &buffsize, fd);
-        for (m = 0; m < 3; m++){
-            array[i][m] =  atoi(strtok(buffer, "\n "));
-        }
+        fscanf(fd, "%d %d %d", array[i][0], array[i][1], array[i][2]);
     }
     printf("Total: %i €.\n", total);
 
