@@ -13,50 +13,66 @@ queue* queue_init(int capacity){
     q -> array = malloc(sizeof(struct element)*capacity);
     q -> capacity = capacity;
     q -> size = 0;
+    //returning the queue
     return q;
 }
 
 
 // To Enqueue an element
 int queue_put(queue *q, struct element *x) {
-    if (!queue_full(q)){
-        if (queue_empty(q))
-            q -> front = *x;
-        q -> array[q -> size] = *x;
-        q -> size++;
-        q -> rear = *x;
+    //waiting until the queue has a empty space
+    while(queue_full(q)){}
+    //when the queue has an empty space it checks if the queue was empty
+    if (queue_empty(q)){
+        //if the queue is empty the new element is going to be set as the front element
+        q -> front = *x;
     }
+    // if the queue is not empty nor full, we put the new element as the last one
+    q -> array[q -> size] = *x;
+    q -> size++;
+    q -> rear = *x;
     return 0;
 }
 
 
 // To Dequeue an element.
 struct element* queue_get(queue *q) {
+    //waiting until the queue has an element
+    while(queue_empty(q)){}
+    //when the queue has an element it returns the front one
     struct element *element;
     int i;
     element = &(q -> front);
+    //displacing the elements one position to the front of the queue
     for (i = 1; i < (q -> size); i++){
         q -> array[i-1] = q -> array[i];
     }
+    //size decrease by one
     q -> size--;
+    //declaring the new front
     q -> front = q -> array[0];
+    //declaring the new rear
     q -> rear = q -> array[q -> size - 1];
-    //free(q -> array[q -> size]);
     return element;
 }
 
 
 //To check queue state
 int queue_empty(queue *q){
+    //if the size is zero the queue is empty, return 1
+    //else return 0
     return (q -> size == 0);
 }
 
 int queue_full(queue *q){
+    // if the size is equal to the capacity the queue is full, return 1
+    // else return 0
     return (q -> size == q -> capacity);
 }
 
 //To destroy the queue and free the resources
 int queue_destroy(queue *q){
+  // liberating the memory of the array and the queue
     free(q -> array);
     free(q);
     return 0;
