@@ -32,15 +32,16 @@ int consumer(){
 
 int main (int argc, const char * argv[] ) {
     int total = 0;
-    int i, *fd, num_lines;
+    int i, num_lines;
+    FILE *fd;
     close(STDIN_FILENO);
-    if ((*fd = open(argv[1], O_RDONLY)) < 0){
+    if ((fd = fopen(argv[1], O_RDONLY)) < 0){
         perror("Error opening the file");
     }
     fscanf(fd, "%d", &num_lines);
     int array[num_lines][3];
     for (i = 0; i < num_lines; i++){
-        fscanf(fd, "%d %d %d", array[i][0], array[i][1], array[i][2]);
+        fscanf(fd, "%d %d %d", &array[i][0], &array[i][1], &array[i][2]);
     }
     printf("Total: %i €.\n", total);
 
