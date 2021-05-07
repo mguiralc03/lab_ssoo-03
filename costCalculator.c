@@ -59,6 +59,9 @@ int main (int argc, const char * argv[]) {
                 pthread_create(&producerth[i], NULL, producer, array[j + i])
         }
     }
+    for (j=0; j<num_lines; j++){
+
+    }
     printf("Total: %i €.\n", total);
 
     return 0;
