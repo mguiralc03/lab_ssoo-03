@@ -11,11 +11,11 @@ queue* queue_init(int capacity){
     queue *q = (queue *)malloc(sizeof(queue));
     int num;
     num = sizeof(element) * capacity;
-    //printf("%d\n", num);
     q -> array[num];
-    //printf("%p\n", q->array);
     q -> capacity = capacity;
     q -> size = 0;
+    q -> front = malloc(sizeof(element));
+    q -> rear = malloc(sizeof(element));
     //returning the queue
     return q;
 }
@@ -25,15 +25,15 @@ queue* queue_init(int capacity){
 int queue_put(queue *q, element *x) {
     //waiting until the queue has a empty space
     while(queue_full(q) == 1){}
-    printf("before if\n");
+    //printf("before if\n");
     //when the queue has an empty space it checks if the queue was empty
     if (queue_empty(q)){
-        printf("after if\n");
+        //printf("after if\n");
         //if the queue is empty the new element is going to be set as the front element
         (q -> front) = *x;
-        element *a;
-        a = &(q -> front);
-        printf("%d\n", a->time);
+        //element *a;
+        //a = &(q -> front);
+        //printf("%d\n", a->time);
     }
     // if the queue is not empty nor full, we put the new element as the last one
     q -> array[q -> size] = *x;
