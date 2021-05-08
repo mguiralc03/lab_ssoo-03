@@ -7,7 +7,6 @@
 #include <sys/stat.h>
 #include <pthread.h>
 #include "queue.h"
-#include "queue.c"
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -25,6 +24,7 @@
 pthread_mutex_t m;
 pthread_cond_t cond1, cond2;
 queue *q;
+int total_cost;
 
 void* producer(void* array){
     //start critical section. Locks shared memory
@@ -47,10 +47,10 @@ void* producer(void* array){
 }
 
 void* consumer(void *arg){
-    int num_lines = (int)arg;
-    int total, i;
+    int *num_lines = (int*) arg;
+    int i;
     //the consumer must read all lines
-    for (i = 0; i < num_lines; i++){
+    for (i = 0; i < *num_lines; i++){
         //start critical section. Locks shared memory
         pthread_mutex_lock(&m);
         //While the queue is empty, the consumer waits until the producer introduce a production in the queue
@@ -59,25 +59,25 @@ void* consumer(void *arg){
             pthread_cond_wait(&cond2, &m);
         }
         //creating an element to get the element of the queue and adding it to the sum
-        element *prize;
-        cost = (element*)malloc(sizeof(element));
-        cost = queue_get(q);
+        element *operation;
+        operation = (element*)malloc(sizeof(element));
+        operation = queue_get(q);
         int time;
         int type;
-        time = cost -> time;
-        type = cost -> type;
-        total = total + (time * type);
+        time = operation -> time;
+        type = operation -> type;
+        total_cost = total_cost + (time * type);
         //sending the signal to the producer, because it has finnished
         pthread_cond_broadcast(&cond1);
         //unlocking the mutex
         pthread_mutex_unlock(&m);
     }
     //return the total cost
-    return &total;
+    return &total_cost;
 }
 
 int main (int argc, const char * argv[]) {
-    int total = 0;
+    int *total = 0;
     int i, num_lines,j;
     FILE *fd;
     //Obtaining number of producers
@@ -113,11 +113,12 @@ int main (int argc, const char * argv[]) {
                 if ((pthread_create(&producerth[i], NULL, producer, array[j + i])) < 0){
                     perror("Error creating thread\n");
                 }
+                pthread_join(producerth[i], NULL);
             }
         }
     }
     pthread_join(consumerth, (void *)total);
-    printf("Total: %d €.\n", **total);
+    printf("Total: %d €.\n", *total);
     //destroying mutex and conditionals
     pthread_mutex_destroy(&m);
     pthread_cond_destroy(&cond1);
