@@ -32,12 +32,13 @@ void* consumer(){
 
 int main (int argc, const char * argv[]) {
     int total = 0;
-    int i, num_lines;
+    int i, num_lines,j;
     FILE *fd;
-    pthread_t *producerth[argv[2]];
-    pthread_t *consumerth;
+    int num_producers = atoi(argv[2]);
+    pthread_t producerth[num_producers];
+    pthread_t consumerth;
     pthread_mutex_t m;
-    pthread_cond_t *conditions[argv[2]];
+    pthread_cond_t conditions[num_producers];
     // opening the file where instructions are written
     //if error returns an error message
     if ((fd = fopen(argv[1], O_RDONLY)) < 0){
@@ -53,14 +54,14 @@ int main (int argc, const char * argv[]) {
         fscanf(fd, "%d %d %d", &array[i][0], &array[i][1], &array[i][2]);
     }
     pthread_create(&consumerth, NULL, consumer, NULL);
-    for (j=0; j < num_lines; j = j + argv[2]){
-        for (i=0; i< argv[2]; i++){
+    for (j=0; j < num_lines; j = j + num_producers){
+        for (i=0; i< num_producers; i++){
             if (j+i < num_lines)
                 pthread_create(&producerth[i], NULL, producer, array[j + i])
         }
     }
     for (j=0; j<num_lines; j++){
-
+        
     }
     printf("Total: %i €.\n", total);
 
