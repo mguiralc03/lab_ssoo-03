@@ -5,12 +5,15 @@
 #include "queue.h"
 
 
-
 //To create a queue
 queue* queue_init(int capacity){
     //Initializing all parameters in the queue
     queue *q = (queue *)malloc(sizeof(queue));
-    q -> array = malloc(sizeof(struct element)*capacity);
+    int num;
+    num = sizeof(element) * capacity;
+    //printf("%d\n", num);
+    q -> array[num];
+    //printf("%p\n", q->array);
     q -> capacity = capacity;
     q -> size = 0;
     //returning the queue
@@ -19,13 +22,18 @@ queue* queue_init(int capacity){
 
 
 // To Enqueue an element
-int queue_put(queue *q, struct element *x) {
+int queue_put(queue *q, element *x) {
     //waiting until the queue has a empty space
-    while(queue_full(q)){}
+    while(queue_full(q) == 1){}
+    printf("before if\n");
     //when the queue has an empty space it checks if the queue was empty
     if (queue_empty(q)){
+        printf("after if\n");
         //if the queue is empty the new element is going to be set as the front element
-        q -> front = *x;
+        (q -> front) = *x;
+        element *a;
+        a = &(q -> front);
+        printf("%d\n", a->time);
     }
     // if the queue is not empty nor full, we put the new element as the last one
     q -> array[q -> size] = *x;
@@ -36,13 +44,13 @@ int queue_put(queue *q, struct element *x) {
 
 
 // To Dequeue an element.
-struct element* queue_get(queue *q) {
+element* queue_get(queue *q) {
     //waiting until the queue has an element
     while(queue_empty(q)){}
     //when the queue has an element it returns the front one
-    struct element *element;
+    element *ele;
     int i;
-    element = &(q -> front);
+    ele = &(q -> front);
     //displacing the elements one position to the front of the queue
     for (i = 1; i < (q -> size); i++){
         q -> array[i-1] = q -> array[i];
@@ -53,7 +61,7 @@ struct element* queue_get(queue *q) {
     q -> front = q -> array[0];
     //declaring the new rear
     q -> rear = q -> array[q -> size - 1];
-    return element;
+    return ele;
 }
 
 
