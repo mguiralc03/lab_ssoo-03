@@ -23,6 +23,10 @@
  */
 
 void* producer(void* array){
+    pthread_cond_wait(&cond1);
+    pthread_mutex_lock(&m);
+    
+    pthread_mutex_unlock(&m);
     //Write in the queue
 }
 
@@ -38,7 +42,10 @@ int main (int argc, const char * argv[]) {
     pthread_t producerth[num_producers];
     pthread_t consumerth;
     pthread_mutex_t m;
-    pthread_cond_t conditions[num_producers];
+    pthread_mutex_int(&m, NULL);
+    pthread_cond_t cond1, cond2;
+    pthread_cond_int(&cond1, NULL);
+    pthread_cond_int(&cond2, NULL);
     // opening the file where instructions are written
     //if error returns an error message
     if ((fd = fopen(argv[1], O_RDONLY)) < 0){
@@ -53,16 +60,18 @@ int main (int argc, const char * argv[]) {
     for (i = 0; i < num_lines; i++){
         fscanf(fd, "%d %d %d", &array[i][0], &array[i][1], &array[i][2]);
     }
+    //creating thread for the consumer
     pthread_create(&consumerth, NULL, consumer, NULL);
+    //creating threads for the instructions and spliting them into the producers
     for (j=0; j < num_lines; j = j + num_producers){
         for (i=0; i< num_producers; i++){
             if (j+i < num_lines)
                 pthread_create(&producerth[i], NULL, producer, array[j + i])
         }
     }
-    for (j=0; j<num_lines; j++){
-        
-    }
+    //for (j=0; j< num_lines; j++){
+    //    conditions[j] = pthread_cond_int(&j,NULL);
+    //}
     printf("Total: %i €.\n", total);
 
     return 0;
