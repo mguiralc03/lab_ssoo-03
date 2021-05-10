@@ -11,7 +11,7 @@ queue* queue_init(int capacity){
     queue *q = (queue *)malloc(sizeof(queue));
     int num;
     num = sizeof(element) * capacity;
-    q -> array[num];
+    q -> array = malloc(num);
     q -> capacity = capacity;
     q -> size = 0;
     //returning the queue
@@ -48,7 +48,7 @@ element* queue_get(queue *q) {
     //when the queue has an element it returns the front one
     element *ele;
     int i;
-    ele = &(q -> front);
+    *ele = q -> front;
     //displacing the elements one position to the front of the queue
     for (i = 1; i < (q -> size); i++){
         q -> array[i-1] = q -> array[i];
