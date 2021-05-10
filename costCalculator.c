@@ -101,12 +101,17 @@ int main (int argc, const char * argv[]) {
         //printf("Threads and queue initialized \n");
         // opening the file where instructions are written
         //if error returns an error message
-        if ((fd = fopen(argv[1], "r")) < 0){
-            perror("Error opening the file\n");
+        if (!(fd = fopen(argv[1], "r"))){
+            perror("Error opening the file");
+            return -1;
         }
         // taking the number of instructions to be read
         //printf("before fscanf\n");
         fscanf(fd, "%d", &num_lines);
+        if (num_lines <= 0){
+            perror("The number of lines must be greater than 0");
+            return -1;
+        }
         //printf("number of lines: %d\n", num_lines);
         //array of three positions, where instructions will be stored.
         //1º position: id of instruction, 2º position: cost of instruction, 3º position: time of use
@@ -118,14 +123,14 @@ int main (int argc, const char * argv[]) {
         //printf("lines read\n");
         //creating thread for the consumer
         if ((pthread_create(&consumerth, NULL, consumer, &num_lines)) < 0){
-            perror ("Error creating thread\n");
+            perror ("Error creating thread");
         };
         //creating threads for the instructions and spliting them into the producers
         for (j=0; j < num_lines; j = j + num_producers){
             for (i=0; i< num_producers; i++){
                 if (j+i < num_lines){
                     if ((pthread_create(&producerth[i], NULL, producer, array[j + i])) < 0){
-                        perror("Error creating thread\n");
+                        perror("Error creating thread");
                     }
                     //printf("thread %d created\n", j+i);
                     if (pthread_join(producerth[i], NULL) < 0)
@@ -145,6 +150,6 @@ int main (int argc, const char * argv[]) {
         pthread_cond_destroy(&cond2);
         return 0;
     }
-    //printf("incorrect arguments\n");
+    printf("Incorrect arguments: Must be three, one file and two integers greater than 0\n");
     return -1;
 }
