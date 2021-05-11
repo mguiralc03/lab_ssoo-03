@@ -28,7 +28,7 @@ int total_cost;
 
 void* producer(void* array){
     //start critical section. Locks shared memory
-    pthread_mutex_lock(&m);
+    if (pthread_mutex_lock(&m));
     //while the queue is full producer waits until consumer liberates one space in the queue
     while (queue_full(q)){
         pthread_cond_wait(&cond1, &m);
@@ -38,11 +38,8 @@ void* producer(void* array){
     element * elem = malloc(sizeof(elem));
     elem ->time = row_instruction[2];
     elem ->type = row_instruction[1];
-    //printf("element created\n");
     //inserting in the queue the element
     queue_put(q, elem);
-    //printf("Produced item %d\n", row_instruction[0]);
-    //printf("element inserted in queue\n");
     // sending signal to the consumer to say it has finished
     pthread_cond_signal(&cond2);
     //unlocking critical section
@@ -70,22 +67,17 @@ void* consumer(void *arg){
         time = operation -> time;
         type = operation -> type;
         total_cost = total_cost + (time * cost[type -1]);
-        //if (i == 49)
-            //printf("%d\n", total_cost);
-        //printf("consumed item %d, cost: %d\n", i, total_cost);
         //sending the signal to the producer, because it has finnished
         pthread_cond_broadcast(&cond1);
         //unlocking the mutex
         pthread_mutex_unlock(&m);
     }
     //return the total cost
-    //printf("before exit\n");
     pthread_exit(&total_cost);
 }
 
 int main (int argc, const char * argv[]) {
     if (argc == 4 && atoi(argv[2]) > 0 && atoi(argv[3]) > 0){
-        //printf("in if\n");
         void *total;
         int i, num_lines,j;
         FILE *fd;
@@ -94,11 +86,16 @@ int main (int argc, const char * argv[]) {
         //Initializing threads, mutex and conditions
         pthread_t producerth[num_producers];
         pthread_t consumerth;
-        pthread_mutex_init(&m, NULL);
-        pthread_cond_init(&cond1, NULL);
-        pthread_cond_init(&cond2, NULL);
+        if ((pthread_mutex_init(&m, NULL)) != 0){
+            perror("Error at initializing the mutex");
+        }
+        if ((pthread_cond_init(&cond1, NULL)) != 0){
+            perror("Error at initializing the first condition variable");
+        }
+        if ((pthread_cond_init(&cond2, NULL)) != 0){
+            perror("Error at initializing the first condition variable");
+        }
         q = queue_init(atoi(argv[3]));
-        //printf("Threads and queue initialized \n");
         // opening the file where instructions are written
         //if error returns an error message
         if (!(fd = fopen(argv[1], "r"))){
@@ -106,21 +103,25 @@ int main (int argc, const char * argv[]) {
             return -1;
         }
         // taking the number of instructions to be read
-        //printf("before fscanf\n");
         fscanf(fd, "%d", &num_lines);
         if (num_lines <= 0){
             perror("The number of lines must be greater than 0");
             return -1;
         }
-        //printf("number of lines: %d\n", num_lines);
         //array of three positions, where instructions will be stored.
         //1º position: id of instruction, 2º position: cost of instruction, 3º position: time of use
         int array[num_lines][3];
         //loop iterating through the instructions
         for (i = 0; i < num_lines; i++){
             fscanf(fd, "%d %d %d", &array[i][0], &array[i][1], &array[i][2]);
+            //The first position of the array is the id, which is always equal to the current iteration + 1
+            //We use this to detect when fscanf is reading outside the file because num_lines is greater than
+            //the number of lines in the file
+            if (array[i][0] != i+1){
+                printf("The number of lines is greater than the number of rows in the file.\n");
+                return -1;
+            }
         }
-        //printf("lines read\n");
         //creating thread for the consumer
         if ((pthread_create(&consumerth, NULL, consumer, &num_lines)) < 0){
             perror ("Error creating thread");
@@ -132,10 +133,8 @@ int main (int argc, const char * argv[]) {
                     if ((pthread_create(&producerth[i], NULL, producer, array[j + i])) < 0){
                         perror("Error creating thread");
                     }
-                    //printf("thread %d created\n", j+i);
                     if (pthread_join(producerth[i], NULL) < 0)
                         return -1;
-                    //printf("thread %d joined\n", i);
                 }
             }
         }
@@ -145,9 +144,12 @@ int main (int argc, const char * argv[]) {
         //destroying mutex and conditionals
         queue_destroy(q);
         fclose(fd);
-        pthread_mutex_destroy(&m);
-        pthread_cond_destroy(&cond1);
-        pthread_cond_destroy(&cond2);
+        if(pthread_mutex_destroy(&m) != 0)
+            perror("Error destroying mutex");
+        if(pthread_cond_destroy(&cond1) != 0)
+            perror("Error destroying condition 1");
+        if(pthread_cond_destroy(&cond2) != 0)
+            perror("Error destroying condition 2");
         return 0;
     }
     printf("Incorrect arguments: Must be three, one file and two integers greater than 0\n");
